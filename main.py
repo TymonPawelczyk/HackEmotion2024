@@ -10,11 +10,38 @@ base_folder = os.getcwd() + "/dataset/"
 
 # Get a list of all subdirectories in the base folder
 subdirs = os.listdir(base_folder)
-print(subdirs)
 
 # Init DataFrame with the user stat
-user = pd.DataFrame()
+user = pd.DataFrame(
+    {
+        "id": pd.Series(1, dtype=int),
+        "Name": ["a"],
+        "Surname": ["b"],
+        "Gender": ["c"],
+        "Age": [12],
+        "Text": ["ee"],
+    }
+)
+user_sessions = pd.DataFrame(
+    {
+        "id_user" : pd.Series(dtype=int),
+        "id_session" : pd.Series(dtype=int)
+    }
+)
+session = pd.DataFrame(
+    {
+        "id_session": pd.Series(dtype=int),
+        "guess" : [],                           #id of the guess not 
+        "correct" : []                          #id of correct
+    }
+)
 
+emotion = pd.DataFrame(
+    {
+        "id" : list(range(1, len(subdirs)+1)),
+        "label" : subdirs
+    }
+)
 
 def show_start_screen():
     global root, name_entry, surname_entry, gender_entry, age_entry, text_entry
@@ -73,7 +100,7 @@ def show_start_screen():
 
 
 def on_submit(start_screen):
-    global user
+    global user, user_id, session_id
 
     # Get the user's information from the entry fields
     name = name_entry.get()
@@ -81,10 +108,17 @@ def on_submit(start_screen):
     gender = gender_entry.get()
     age = age_entry.get()
     text = text_entry.get()
+    print(f"user id {user.iloc[-1:]['id'].values[-1]}")
+    if user.empty:
+        user_id = 1
+    else:
+        # adding using last record
+        user_id = user.iloc[-1:]["id"].values[-1] + 1
 
     # Add the user's information to the user DataFrame
     new_data = pd.DataFrame(
         {
+            "id": [user_id],
             "Name": [name],
             "Surname": [surname],
             "Gender": [gender],
@@ -92,24 +126,44 @@ def on_submit(start_screen):
             "Text": [text],
         }
     )
+
+    if(user_sessions.empty):
+        session_id = 1
+    else:
+        session_id = user_sessions.iloc[-1:]["id"].values[-1] + 1
+
+    # add user's session to table user_sessions
+    new_user_session = pd.DataFrame(
+        {
+            "id_user" : [user_id],
+            "id_session" : [session_id]
+        }
+    )
+
+
+    pd.concat([user_sessions, new_user_session])
     user = pd.concat([user, new_data], ignore_index=True)
 
     # Show the main application and destroy the start screen
     root.deiconify()
     start_screen.destroy()
-    print(user)
+    # print(user)
 
-
-def on_button_click(button_number):
-    print(f"Button {button_number} clicked!")
+def on_button_click(button_id):
+    # print(f"{emotion['label'].iloc[button_id]} clicked!")
+    # getting the actual label
+    # add to our session the guess and the actual emotion id
+    session.loc[len(session.index)] = [session_id, button_id+1, actual_emotion]
+    # print(f"Current Session:\n{session}")
     change_image()
 
 
 def load_random_image():
-
+    global actual_emotion
     # Randomly select a subdirectory
-    selected_subdir = random.choice(subdirs)
-
+    selected_subdir_enum = random.choice(list(enumerate(subdirs)))
+    selected_subdir = selected_subdir_enum[1]
+    actual_emotion = selected_subdir_enum[0] + 1
     # Get a list of all image files in the selected subdirectory
     image_files = [
         f
@@ -163,9 +217,9 @@ button_frame = tk.Frame(root)
 button_frame.pack(pady=10)
 
 # Create 5 buttons
-for subdir in subdirs:
+for ind, subdir in enumerate(subdirs):
     button = tk.Button(
-        button_frame, text=f"{subdir}", command=lambda i=subdir: on_button_click(i)
+        button_frame, text=f"{subdir}", command=lambda i = ind: on_button_click(i)
     )
     button.pack(side=tk.LEFT, padx=5)
 
