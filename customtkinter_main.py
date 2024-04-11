@@ -11,31 +11,44 @@ from PIL import Image, ImageTk
 set_appearance_mode = ("dark")
 
 start_time = None
-base_folder = os.getcwd() + "/dataset"
+
+base_folder = os.getcwd() + "/dataset/"
 subdirs = os.listdir(base_folder)
-user = pd.DataFrame(
-    {
-        "id": pd.Series(dtype=int),
-        "Name": [],
-        "Surname": [],
-        "Gender": [],
-        "Age": [],
-        "Text": [],
-    }
-)
-user_sessions = pd.DataFrame(
-    {"id_user": pd.Series(dtype=int),
-      "id_session": pd.Series(dtype=int)}
-)
-session = pd.DataFrame(
-    {
-        "id_session": pd.Series(dtype=int),
-        "guess": pd.Series(dtype=int),
-        "correct": pd.Series(dtype=int),
-        "response_time": pd.Series(dtype=float),
-    }
-)
-emotion = pd.DataFrame({"id": list(range(1, len(subdirs) + 1)), "label": subdirs})
+
+path_to_csv = os.getcwd() + "/csv"
+csv_file_names = os.listdir(path_to_csv)
+
+if len(csv_file_names) == 0:
+    user = pd.DataFrame(
+        {
+            "id": pd.Series(dtype=int),
+            "Name": [],
+            "Surname": [],
+            "Gender": [],
+            "Age": [],
+            "Text": [],
+        }
+    )
+    user_sessions = pd.DataFrame(
+        {"id_user": pd.Series(dtype=int), "id_session": pd.Series(dtype=int)}
+    )
+    session = pd.DataFrame(
+        {
+            "id": pd.Series(dtype=int),
+            "guess": pd.Series(dtype=int),  # id of the guess not
+            "correct": pd.Series(dtype=int),  # id of correct
+            "response_time": pd.Series(dtype=float)
+        }
+    )
+    emotion = pd.DataFrame({"id": list(range(1, len(subdirs) + 1)), "label": subdirs})
+else:
+    user = pd.read_csv(path_to_csv + "/user.csv", sep=" ")
+    user_sessions = pd.read_csv(path_to_csv + "/user_sessions.csv", sep=" ")
+    session = pd.read_csv(path_to_csv + "/session.csv", sep=" ")
+    emotion = pd.read_csv(path_to_csv + "/emotion.csv", sep=" ")
+
+print(user)
+print(session)
 
 
 def show_start_screen():
@@ -127,14 +140,14 @@ def on_submit(start_screen):
     if user_sessions.empty:
         session_id = 1
     else:
-        session_id = user_sessions.iloc[-1:]["id"].values[-1] + 1
+        print(user_sessions.iloc[-1:])
+        session_id = user_sessions.iloc[-1:]["id_session"].values[-1] + 1
     new_user_session = pd.DataFrame({"id_user": [user_id], "id_session": [session_id]})
     user_sessions = pd.concat([user_sessions, new_user_session])
     user = pd.concat([user, new_data], ignore_index=True)
     root.deiconify()
     start_screen.destroy()
     start_time = t.time()
-    print(user)
 
 
 def on_button_click(button_number):
@@ -146,10 +159,10 @@ def on_button_click(button_number):
         )
     new_session_record = pd.DataFrame(
         {
-            "id_session": [session_id],
+            "id": [session_id],
             "guess": [button_number + 1],
             "correct": [actual_emotion],
-            "response_time": [response_time],
+            "response_time": [response_time]
         }
     )
     session = pd.concat([session, new_session_record], ignore_index=True)
@@ -197,12 +210,12 @@ def change_image():
 
 root = ctk.CTk()
 root.title("MyAcousticOrNot")
-root.geometry("800x600")
+root.geometry("1200x700")
 show_start_screen()
 button_frame = ctk.CTkFrame(root)
 button_frame.pack(pady=10)
 for (ind, subdir) in enumerate(subdirs):
-    button = tk.Button(
+    button = ctk.CTkButton(
         button_frame, text=f"{subdir}", command=lambda i=ind: on_button_click(i)
     )
     button.pack(side=tk.LEFT, padx=5)
@@ -210,3 +223,13 @@ for (ind, subdir) in enumerate(subdirs):
 image_label = ctk.CTkLabel(root, image=current_image, text=None)
 image_label.pack()
 root.mainloop()
+
+# create folder with csv's if not in directory
+csv_dir = os.path.join(os.getcwd(), "csv")
+if not os.path.exists(csv_dir):
+    os.makedirs(csv_dir)
+
+session.to_csv(csv_dir + "/session.csv", sep=" ", index=False)
+user.to_csv(csv_dir + "/user.csv", sep=" ", index=False)
+user_sessions.to_csv(csv_dir + "/user_sessions.csv", sep=" ", index=False)
+emotion.to_csv(csv_dir + "/emotion.csv", sep=" ", index=False)
