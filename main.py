@@ -17,12 +17,12 @@ subdirs = os.listdir(base_folder)
 # Init DataFrame with the user stat
 user = pd.DataFrame(
     {
-        "id": pd.Series(1, dtype=int),
-        "Name": ["a"],
-        "Surname": ["b"],
-        "Gender": ["c"],
-        "Age": [12],
-        "Text": ["ee"],
+        "id": pd.Series( dtype=int),
+        "Name": [],
+        "Surname": [],
+        "Gender": [],
+        "Age": [],
+        "Text": [],
     }
 )
 user_sessions = pd.DataFrame(
@@ -34,8 +34,9 @@ user_sessions = pd.DataFrame(
 session = pd.DataFrame(
     {
         "id_session": pd.Series(dtype=int),
-        "guess" : [],                           #id of the guess not 
-        "correct" : []                          #id of correct
+        "guess" : pd.Series(dtype=int),                           #id of the guess not 
+        "correct" : pd.Series(dtype=int),                          #id of correct
+        "response_time" : pd.Series(dtype=float) 
     }
 )
 
@@ -107,7 +108,7 @@ def show_start_screen():
 
 
 def on_submit(start_screen):
-    global user, user_id, session_id
+    global user, user_id, session_id, start_time, user_sessions
 
     # Get the user's information from the entry fields
     name = name_entry.get()
@@ -115,7 +116,6 @@ def on_submit(start_screen):
     gender = gender_var.get()
     age = age_entry.get()
     text = text_entry.get()
-    print(f"user id {user.iloc[-1:]['id'].values[-1]}")
     if user.empty:
         user_id = 1
     else:
@@ -148,29 +148,29 @@ def on_submit(start_screen):
     )
 
 
-    pd.concat([user_sessions, new_user_session])
+    user_sessions = pd.concat([user_sessions, new_user_session])
     user = pd.concat([user, new_data], ignore_index=True)
 
     # Show the main application and destroy the start screen
     root.deiconify()
     start_screen.destroy()
+    start_time = t.time()
     
 def on_button_click(button_number):
-    global user, start_time
+    global user, start_time, session
 
     if start_time is not None:
         response_time = t.time() - start_time  # Calculate the response time
         print(f"Button {button_number} clicked! Response time: {response_time:.2f} seconds")
 
-        # Add the response time to the user DataFrame
-        new_data = pd.DataFrame(
-            {
-                "Button": [button_number],
-                "ResponseTime": [response_time],
-            }
-        )
-        user = pd.concat([user, new_data], ignore_index=True)
-        session.loc[len(session.index)] = [session_id, button_id+1, actual_emotion]
+    new_session_record = pd.DataFrame({
+        "id_session": [session_id],
+        "guess" : [button_number+1],                           #id of the guess not 
+        "correct" : [actual_emotion],                          #id of correct
+        "response_time" : [response_time]
+    })
+    session = pd.concat([session, new_session_record], ignore_index=True)
+    print(session)
     change_image()
 
 
