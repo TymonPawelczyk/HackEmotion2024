@@ -9,7 +9,7 @@ import time as t
 from PIL import Image, ImageTk
 
 start_time = None
-base_folder = os.getcwd() + "/HackEmotion2024/dataset"
+base_folder = os.getcwd() + "/dataset"
 subdirs = os.listdir(base_folder)
 user = pd.DataFrame(
     {
