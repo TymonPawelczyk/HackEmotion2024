@@ -6,7 +6,9 @@ import tkinter.messagebox as tk_messagebox
 import time as t
 from PIL import Image, ImageTk
 
-start_time = None  # Add a global variable to store the start time of the current image display
+start_time = (
+    None  # Add a global variable to store the start time of the current image display
+)
 
 # Folder containing the images
 base_folder = os.getcwd() + "/dataset/"
@@ -17,7 +19,7 @@ subdirs = os.listdir(base_folder)
 # Init DataFrame with the user stat
 user = pd.DataFrame(
     {
-        "id": pd.Series( dtype=int),
+        "id": pd.Series(dtype=int),
         "Name": [],
         "Surname": [],
         "Gender": [],
@@ -26,26 +28,19 @@ user = pd.DataFrame(
     }
 )
 user_sessions = pd.DataFrame(
-    {
-        "id_user" : pd.Series(dtype=int),
-        "id_session" : pd.Series(dtype=int)
-    }
+    {"id_user": pd.Series(dtype=int), "id_session": pd.Series(dtype=int)}
 )
 session = pd.DataFrame(
     {
         "id_session": pd.Series(dtype=int),
-        "guess" : pd.Series(dtype=int),                           #id of the guess not 
-        "correct" : pd.Series(dtype=int),                          #id of correct
-        "response_time" : pd.Series(dtype=float) 
+        "guess": pd.Series(dtype=int),  # id of the guess not
+        "correct": pd.Series(dtype=int),  # id of correct
+        "response_time": pd.Series(dtype=float),
     }
 )
 
-emotion = pd.DataFrame(
-    {
-        "id" : list(range(1, len(subdirs)+1)),
-        "label" : subdirs
-    }
-)
+emotion = pd.DataFrame({"id": list(range(1, len(subdirs) + 1)), "label": subdirs})
+
 
 def show_start_screen():
     global root, name_entry, surname_entry, gender_var, age_entry, text_entry
@@ -106,7 +101,6 @@ def show_start_screen():
     submit_button.pack()
 
 
-
 def on_submit(start_screen):
     global user, user_id, session_id, start_time, user_sessions
 
@@ -134,19 +128,13 @@ def on_submit(start_screen):
         }
     )
 
-    if(user_sessions.empty):
+    if user_sessions.empty:
         session_id = 1
     else:
         session_id = user_sessions.iloc[-1:]["id"].values[-1] + 1
 
     # add user's session to table user_sessions
-    new_user_session = pd.DataFrame(
-        {
-            "id_user" : [user_id],
-            "id_session" : [session_id]
-        }
-    )
-
+    new_user_session = pd.DataFrame({"id_user": [user_id], "id_session": [session_id]})
 
     user_sessions = pd.concat([user_sessions, new_user_session])
     user = pd.concat([user, new_data], ignore_index=True)
@@ -155,20 +143,25 @@ def on_submit(start_screen):
     root.deiconify()
     start_screen.destroy()
     start_time = t.time()
-    
+
+
 def on_button_click(button_number):
     global user, start_time, session
 
     if start_time is not None:
         response_time = t.time() - start_time  # Calculate the response time
-        print(f"Button {button_number} clicked! Response time: {response_time:.2f} seconds")
+        print(
+            f"Button {button_number} clicked! Response time: {response_time:.2f} seconds"
+        )
 
-    new_session_record = pd.DataFrame({
-        "id_session": [session_id],
-        "guess" : [button_number+1],                           #id of the guess not 
-        "correct" : [actual_emotion],                          #id of correct
-        "response_time" : [response_time]
-    })
+    new_session_record = pd.DataFrame(
+        {
+            "id_session": [session_id],
+            "guess": [button_number + 1],  # id of the guess not
+            "correct": [actual_emotion],  # id of correct
+            "response_time": [response_time],
+        }
+    )
     session = pd.concat([session, new_session_record], ignore_index=True)
     print(session)
     change_image()
@@ -221,8 +214,6 @@ def change_image():
     start_time = t.time()  # Record the start time when the image is displayed
 
 
-
-
 # Create the main window
 root = tk.Tk()
 root.title("MyAcousticOrNot")
@@ -238,7 +229,7 @@ button_frame.pack(pady=10)
 # Create 5 buttons
 for ind, subdir in enumerate(subdirs):
     button = tk.Button(
-        button_frame, text=f"{subdir}", command=lambda i = ind: on_button_click(i)
+        button_frame, text=f"{subdir}", command=lambda i=ind: on_button_click(i)
     )
     button.pack(side=tk.LEFT, padx=5)
 
@@ -249,3 +240,13 @@ image_label.pack()
 
 # Run the tkinter event loop
 root.mainloop()
+
+# create folder with csv's if not in directory
+csv_dir = os.path.join(os.getcwd(), "csv")
+if not os.path.exists(csv_dir):
+    os.makedirs(csv_dir)
+
+session.to_csv(csv_dir + "/session.csv", sep=" ", index=False, mode="a")
+user.to_csv(csv_dir + "/user.csv", sep=" ", index=False, mode="a")
+user_sessions.to_csv(csv_dir + "/user_sessions.csv", sep=" ", index=False, mode="a")
+emotion.to_csv(csv_dir + "/emotion.csv", sep=" ", index=False, mode="a")
