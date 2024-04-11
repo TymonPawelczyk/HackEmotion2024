@@ -6,9 +6,8 @@ import tkinter.messagebox as tk_messagebox
 import time as t
 from PIL import Image, ImageTk
 
-start_time = (
-    None  # Add a global variable to store the start time of the current image display
-)
+start_time = None  # Add a global variable to store the start time of the current image display
+
 
 # Folder containing the images
 base_folder = os.getcwd() + "/dataset/"
