@@ -3,7 +3,10 @@ import random
 import pandas as pd
 import tkinter as tk
 import tkinter.messagebox as tk_messagebox
+import time as t
 from PIL import Image, ImageTk
+
+start_time = None  # Add a global variable to store the start time of the current image display
 
 # Folder containing the images
 base_folder = os.getcwd() + "/dataset/"
@@ -44,7 +47,7 @@ emotion = pd.DataFrame(
 )
 
 def show_start_screen():
-    global root, name_entry, surname_entry, gender_entry, age_entry, text_entry
+    global root, name_entry, surname_entry, gender_var, age_entry, text_entry
 
     # Hide the main application frame
     root.withdraw()
@@ -52,7 +55,7 @@ def show_start_screen():
     # Create a new window for the start screen
     start_screen = tk.Toplevel(root)
     start_screen.title("Start Screen")
-    start_screen.geometry("400x300")
+    start_screen.geometry("800x600")
 
     # Create a validation function for numeric input
     def is_numeric(input_string):
@@ -64,7 +67,7 @@ def show_start_screen():
 
     validate_numeric = root.register(is_numeric)
 
-    # Create entry fields for name, surname, gender, age, and text
+    # Create entry fields for name, surname, age, and text
     name_label = tk.Label(start_screen, text="Name:")
     name_label.pack()
     name_entry = tk.Entry(start_screen)
@@ -77,7 +80,10 @@ def show_start_screen():
 
     gender_label = tk.Label(start_screen, text="Gender:")
     gender_label.pack()
-    gender_entry = tk.Entry(start_screen)
+    gender_options = ["Male", "Female", "Other"]  # List of gender options
+    gender_var = tk.StringVar()
+    gender_var.set(gender_options[0])  # Default value
+    gender_entry = tk.OptionMenu(start_screen, gender_var, *gender_options)
     gender_entry.pack()
 
     age_label = tk.Label(start_screen, text="Age:")
@@ -99,13 +105,14 @@ def show_start_screen():
     submit_button.pack()
 
 
+
 def on_submit(start_screen):
     global user, user_id, session_id
 
     # Get the user's information from the entry fields
     name = name_entry.get()
     surname = surname_entry.get()
-    gender = gender_entry.get()
+    gender = gender_var.get()
     age = age_entry.get()
     text = text_entry.get()
     print(f"user id {user.iloc[-1:]['id'].values[-1]}")
@@ -119,8 +126,8 @@ def on_submit(start_screen):
     new_data = pd.DataFrame(
         {
             "id": [user_id],
-            "Name": [name],
-            "Surname": [surname],
+            "Name": [name.title()],
+            "Surname": [surname.title()],
             "Gender": [gender],
             "Age": [age],
             "Text": [text],
@@ -147,14 +154,23 @@ def on_submit(start_screen):
     # Show the main application and destroy the start screen
     root.deiconify()
     start_screen.destroy()
-    # print(user)
+    
+def on_button_click(button_number):
+    global user, start_time
 
-def on_button_click(button_id):
-    # print(f"{emotion['label'].iloc[button_id]} clicked!")
-    # getting the actual label
-    # add to our session the guess and the actual emotion id
-    session.loc[len(session.index)] = [session_id, button_id+1, actual_emotion]
-    # print(f"Current Session:\n{session}")
+    if start_time is not None:
+        response_time = t.time() - start_time  # Calculate the response time
+        print(f"Button {button_number} clicked! Response time: {response_time:.2f} seconds")
+
+        # Add the response time to the user DataFrame
+        new_data = pd.DataFrame(
+            {
+                "Button": [button_number],
+                "ResponseTime": [response_time],
+            }
+        )
+        user = pd.concat([user, new_data], ignore_index=True)
+        session.loc[len(session.index)] = [session_id, button_id+1, actual_emotion]
     change_image()
 
 
@@ -197,11 +213,14 @@ def load_random_image():
 
 
 def change_image():
-    global image_label, current_image
+    global image_label, current_image, start_time
     tk_image, _ = load_random_image()
     current_image = tk_image
     image_label.configure(image=current_image)
     image_label.image = current_image
+    start_time = t.time()  # Record the start time when the image is displayed
+
+
 
 
 # Create the main window
