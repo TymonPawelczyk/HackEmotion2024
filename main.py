@@ -16,30 +16,38 @@ base_folder = os.getcwd() + "/dataset/"
 subdirs = os.listdir(base_folder)
 
 # Init DataFrame with the user stat
-user = pd.DataFrame(
-    {
-        "id": pd.Series(dtype=int),
-        "Name": [],
-        "Surname": [],
-        "Gender": [],
-        "Age": [],
-        "Text": [],
-    }
-)
-user_sessions = pd.DataFrame(
-    {"id_user": pd.Series(dtype=int), "id_session": pd.Series(dtype=int)}
-)
-session = pd.DataFrame(
-    {
-        "id_session": pd.Series(dtype=int),
-        "guess": pd.Series(dtype=int),  # id of the guess not
-        "correct": pd.Series(dtype=int),  # id of correct
-        "response_time": pd.Series(dtype=float),
-    }
-)
+path_to_csv = os.getcwd() + "/csv"
+csv_file_names = os.listdir(path_to_csv)
+if len(csv_file_names) == 0:
+    user = pd.DataFrame(
+        {
+            "id": pd.Series(dtype=int),
+            "Name": [],
+            "Surname": [],
+            "Gender": [],
+            "Age": [],
+            "Text": [],
+        }
+    )
+    user_sessions = pd.DataFrame(
+        {"id_user": pd.Series(dtype=int), "id_session": pd.Series(dtype=int)}
+    )
+    session = pd.DataFrame(
+        {
+            "id": pd.Series(dtype=int),
+            "guess": pd.Series(dtype=int),  # id of the guess not
+            "correct": pd.Series(dtype=int),  # id of correct
+            "response_time": pd.Series(dtype=float),
+        }
+    )
+    emotion = pd.DataFrame({"id": list(range(1, len(subdirs) + 1)), "label": subdirs})
+else:
+    user = pd.read_csv(path_to_csv + "/user.csv", sep=" ")
+    user_sessions = pd.read_csv(path_to_csv + "/user_sessions.csv", sep=" ")
+    session = pd.read_csv(path_to_csv + "/session.csv", sep=" ")
+    emotion = pd.read_csv(path_to_csv + "/emotion.csv", sep=" ")
 
-emotion = pd.DataFrame({"id": list(range(1, len(subdirs) + 1)), "label": subdirs})
-
+print(user)
 
 def show_start_screen():
     global root, name_entry, surname_entry, gender_var, age_entry, text_entry
@@ -130,7 +138,8 @@ def on_submit(start_screen):
     if user_sessions.empty:
         session_id = 1
     else:
-        session_id = user_sessions.iloc[-1:]["id"].values[-1] + 1
+        print(user_sessions.iloc[-1:])
+        session_id = user_sessions.iloc[-1:]["id_session"].values[-1] + 1
 
     # add user's session to table user_sessions
     new_user_session = pd.DataFrame({"id_user": [user_id], "id_session": [session_id]})
@@ -155,7 +164,7 @@ def on_button_click(button_number):
 
     new_session_record = pd.DataFrame(
         {
-            "id_session": [session_id],
+            "id": [session_id],
             "guess": [button_number + 1],  # id of the guess not
             "correct": [actual_emotion],  # id of correct
             "response_time": [response_time],
@@ -245,7 +254,7 @@ csv_dir = os.path.join(os.getcwd(), "csv")
 if not os.path.exists(csv_dir):
     os.makedirs(csv_dir)
 
-session.to_csv(csv_dir + "/session.csv", sep=" ", index=False, mode="a")
-user.to_csv(csv_dir + "/user.csv", sep=" ", index=False, mode="a")
-user_sessions.to_csv(csv_dir + "/user_sessions.csv", sep=" ", index=False, mode="a")
-emotion.to_csv(csv_dir + "/emotion.csv", sep=" ", index=False, mode="a")
+session.to_csv(csv_dir + "/session.csv", sep=" ", index=False)
+user.to_csv(csv_dir + "/user.csv", sep=" ", index=False)
+user_sessions.to_csv(csv_dir + "/user_sessions.csv", sep=" ", index=False)
+emotion.to_csv(csv_dir + "/emotion.csv", sep=" ", index=False)
