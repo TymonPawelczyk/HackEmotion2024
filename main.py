@@ -6,13 +6,15 @@ import tkinter.messagebox as tk_messagebox
 from PIL import Image, ImageTk
 
 # Folder containing the images
-base_folder = "data/archive/dataset"
+base_folder = os.getcwd() + "/dataset/"
 
 # Get a list of all subdirectories in the base folder
 subdirs = os.listdir(base_folder)
+print(subdirs)
 
 # Init DataFrame with the user stat
 user = pd.DataFrame()
+
 
 def show_start_screen():
     global root, name_entry, surname_entry, gender_entry, age_entry, text_entry
@@ -53,7 +55,9 @@ def show_start_screen():
 
     age_label = tk.Label(start_screen, text="Age:")
     age_label.pack()
-    age_entry = tk.Entry(start_screen, validate="key", validatecommand=(validate_numeric, '%P'))
+    age_entry = tk.Entry(
+        start_screen, validate="key", validatecommand=(validate_numeric, "%P")
+    )
     age_entry.pack()
 
     text_label = tk.Label(start_screen, text="Text:")
@@ -62,10 +66,11 @@ def show_start_screen():
     text_entry.pack()
 
     # Create a submit button to save the user's information and show the main application
-    submit_button = tk.Button(start_screen, text="Submit", command=lambda: on_submit(start_screen))
+    submit_button = tk.Button(
+        start_screen, text="Submit", command=lambda: on_submit(start_screen)
+    )
     submit_button.pack()
 
-    
 
 def on_submit(start_screen):
     global user
@@ -78,18 +83,27 @@ def on_submit(start_screen):
     text = text_entry.get()
 
     # Add the user's information to the user DataFrame
-    new_data = pd.DataFrame({'Name': [name], 'Surname': [surname], 'Gender': [gender], 'Age': [age], 'Text': [text]})
+    new_data = pd.DataFrame(
+        {
+            "Name": [name],
+            "Surname": [surname],
+            "Gender": [gender],
+            "Age": [age],
+            "Text": [text],
+        }
+    )
     user = pd.concat([user, new_data], ignore_index=True)
-
 
     # Show the main application and destroy the start screen
     root.deiconify()
     start_screen.destroy()
     print(user)
 
+
 def on_button_click(button_number):
     print(f"Button {button_number} clicked!")
     change_image()
+
 
 def load_random_image():
 
@@ -97,7 +111,11 @@ def load_random_image():
     selected_subdir = random.choice(subdirs)
 
     # Get a list of all image files in the selected subdirectory
-    image_files = [f for f in os.listdir(os.path.join(base_folder, selected_subdir)) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+    image_files = [
+        f
+        for f in os.listdir(os.path.join(base_folder, selected_subdir))
+        if f.lower().endswith((".png", ".jpg", ".jpeg"))
+    ]
 
     # Randomly select an image file
     selected_image_file = random.choice(image_files)
@@ -123,12 +141,14 @@ def load_random_image():
 
     return tk_image, selected_subdir
 
+
 def change_image():
     global image_label, current_image
     tk_image, _ = load_random_image()
     current_image = tk_image
     image_label.configure(image=current_image)
     image_label.image = current_image
+
 
 # Create the main window
 root = tk.Tk()
@@ -144,7 +164,9 @@ button_frame.pack(pady=10)
 
 # Create 5 buttons
 for subdir in subdirs:
-    button = tk.Button(button_frame, text=f"{subdir}", command=lambda i=subdir: on_button_click(i))
+    button = tk.Button(
+        button_frame, text=f"{subdir}", command=lambda i=subdir: on_button_click(i)
+    )
     button.pack(side=tk.LEFT, padx=5)
 
 # Load and display a random image
