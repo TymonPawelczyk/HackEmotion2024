@@ -8,6 +8,8 @@ import tkinter.messagebox as tk_messagebox
 import time as t
 from PIL import Image, ImageTk
 
+set_appearance_mode = ("dark")
+
 start_time = None
 base_folder = os.getcwd() + "/dataset"
 subdirs = os.listdir(base_folder)
@@ -59,27 +61,46 @@ def show_start_screen():
     surname_label.pack()
     surname_entry = ctk.CTkEntry(start_screen)
     surname_entry.pack()
+
+    # Define gender_options as a list of strings
+    gender_options = ["Male", "Female", "Other"]
+
     gender_label = ctk.CTkLabel(start_screen, text="Gender:")
     gender_label.pack()
-    gender_options = ["Male", "Female", "Other"]
+
+    # Initialize gender_var as a tkinter.StringVar
     gender_var = tk.StringVar()
-    gender_var.set(gender_options[0])
-    gender_entry = tk.OptionMenu(start_screen, gender_var, *gender_options)
+
+    # Create the CTkComboBox with the gender_options
+    gender_entry = ctk.CTkComboBox(master=start_screen, values=gender_options, fg_color="#003566", dropdown_fg_color="#003566")
     gender_entry.pack()
+
+    # Set the value of gender_var to the first value of gender_options
+    gender_var.set(gender_options[0])
+
     age_label = ctk.CTkLabel(start_screen, text="Age:")
     age_label.pack()
-    age_entry = tk.Entry(
-        start_screen, validate="key", validatecommand=(validate_numeric, "%P")
-    )
+
+# Change age_entry to CTkEntry and set the fg_color option for background color
+    age_entry = ctk.CTkEntry(start_screen, validate="key", validatecommand=(validate_numeric, "%P"), fg_color="#343638")
     age_entry.pack()
     text_label = ctk.CTkLabel(start_screen, text="Text:")
     text_label.pack()
     text_entry = ctk.CTkEntry(start_screen)
     text_entry.pack()
-    submit_button = tk.Button(
-        start_screen, text="Submit", command=lambda: on_submit(start_screen)
-    )
+    text_label = ctk.CTkLabel(start_screen, text="\n")
+    text_label.pack()
+    submit_button = ctk.CTkButton(
+    start_screen,
+    text="Submit",
+    command=lambda: on_submit(start_screen),
+    # text_font=("Helvetica", 14, "bold"),  # Change the font size and style as needed
+    
+)
     submit_button.pack()
+
+
+
 
 
 def on_submit(start_screen):
