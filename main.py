@@ -3,7 +3,10 @@ import random
 import pandas as pd
 import tkinter as tk
 import tkinter.messagebox as tk_messagebox
+import time as t
 from PIL import Image, ImageTk
+
+start_time = None  # Add a global variable to store the start time of the current image display
 
 # Folder containing the images
 base_folder = os.getcwd() + "/dataset/"
@@ -105,11 +108,26 @@ def on_submit(start_screen):
 
 
 def on_button_click(button_number):
-    print(f"Button {button_number} clicked!")
+    global user, start_time
+
+    if start_time is not None:
+        response_time = t.time() - start_time  # Calculate the response time
+        print(f"Button {button_number} clicked! Response time: {response_time:.2f} seconds")
+
+        # Add the response time to the user DataFrame
+        new_data = pd.DataFrame(
+            {
+                "Button": [button_number],
+                "ResponseTime": [response_time],
+            }
+        )
+        user = pd.concat([user, new_data], ignore_index=True)
+
     change_image()
 
 
 def load_random_image():
+
 
     # Randomly select a subdirectory
     selected_subdir = random.choice(subdirs)
@@ -147,11 +165,14 @@ def load_random_image():
 
 
 def change_image():
-    global image_label, current_image
+    global image_label, current_image, start_time
     tk_image, _ = load_random_image()
     current_image = tk_image
     image_label.configure(image=current_image)
     image_label.image = current_image
+    start_time = t.time()  # Record the start time when the image is displayed
+
+
 
 
 # Create the main window
