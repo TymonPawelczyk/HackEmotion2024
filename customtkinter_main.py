@@ -5,6 +5,8 @@ import pandas as pd
 import tkinter as tk
 import tkinter.messagebox as tk_messagebox
 import time as t
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from PIL import Image
 
 
@@ -66,8 +68,50 @@ class GameApp:
 
         confirm_button = ctk.CTkButton(self.main_menu, text="Confirm", command=self.confirm_selection)
         confirm_button.pack(pady=(0, 20))
+
+        stat_button = ctk.CTkButton(self.main_menu, text="Show Stats", command=self.show_stats)
+        stat_button.pack(pady=(0, 20))
         # self.root.deiconify()
         self.main_menu.protocol("WM_DELETE_WINDOW", self.root.destroy)
+
+    def show_stats(self):
+        self.stats = ctk.CTkToplevel(self.root)
+        self.stats.geometry("1200x600")
+        self.stats.title("Stats")
+
+        prev_session_id = int(self.session.iloc[0]['id'])
+
+        quest_quant = 0
+        good_answ = 0
+        for row in self.session.iterrows():
+            # print(row)
+            # print(session.at[row[0], 'id'])
+            current_session_id = self.session.at[row[0], 'id']
+
+            if (current_session_id == prev_session_id):
+                # agregacja danych dla sesji id
+                quest_quant += 1
+                # checking if in that session it was a correct answer
+                if(self.session.at[row[0], 'guess'] == self.session.at[row[0], 'correct']):
+                    good_answ += 1
+                    
+            else:
+                # print("Good answers: " + str(good_answ))
+
+                print(f"{prev_session_id} : {good_answ/quest_quant * 100}%")
+                label = ctk.CTkLabel(self.stats, text=f"{prev_session_id} : {good_answ/quest_quant * 100}%")
+                label.pack(pady=(10, 0))
+
+                quest_quant = 1
+                good_answ = 0
+                if(self.session.at[row[0], 'guess'] == self.session.at[row[0], 'correct']):
+                    good_answ += 1
+            prev_session_id = current_session_id
+
+        print(f"{current_session_id} : {good_answ/quest_quant * 100}%")
+        label = ctk.CTkLabel(self.stats, text=f"{prev_session_id} : {good_answ/quest_quant * 100}%")
+        label.pack(pady=(10, 0))
+
 
     def confirm_selection(self):
         selected_option = self.option_menu.get()
