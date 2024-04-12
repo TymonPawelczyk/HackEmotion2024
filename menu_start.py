@@ -14,8 +14,6 @@ def confirm_selection():
     elif selected_option == 'GameMode 2':
         print('gamemode2')
 
-    elif selected_option == 'GameMode 3':
-        print('gamemode3')
 
 options = ["GameMode 1", "GameMode 2", "GameMode 3"]
 
