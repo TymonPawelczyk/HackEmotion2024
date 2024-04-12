@@ -10,7 +10,6 @@ def confirm_selection():
     print(f'Buttno confirm clicked. You choose: {selected_option}')
     if selected_option == 'GameMode 1':
         print('gamemode1')
-        customtkinter_main.game1()
     elif selected_option == 'GameMode 2':
         print('gamemode2')
 
