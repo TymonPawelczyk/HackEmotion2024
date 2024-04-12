@@ -99,7 +99,7 @@ class GameApp:
                 # print("Good answers: " + str(good_answ))
 
                 print(f"{prev_session_id} : {good_answ/quest_quant * 100}%")
-                label = ctk.CTkLabel(self.stats, text=f"{prev_session_id} : {good_answ/quest_quant * 100}%")
+                label = ctk.CTkLabel(self.stats, text=f"{prev_session_id} : {round(good_answ/quest_quant * 100, 2)}%")
                 label.pack(pady=(10, 0))
 
                 quest_quant = 1
@@ -109,7 +109,7 @@ class GameApp:
             prev_session_id = current_session_id
 
         print(f"{current_session_id} : {good_answ/quest_quant * 100}%")
-        label = ctk.CTkLabel(self.stats, text=f"{prev_session_id} : {good_answ/quest_quant * 100}%")
+        label = ctk.CTkLabel(self.stats, text=f"{prev_session_id} : {round(good_answ/quest_quant * 100, 2)}%")
         label.pack(pady=(10, 0))
 
 

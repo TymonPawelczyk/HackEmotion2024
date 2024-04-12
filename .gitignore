@@ -1,6 +1,4 @@
-data/*
 dataset/*
 csv/*
 app/*
 __pycache__
-models/*
