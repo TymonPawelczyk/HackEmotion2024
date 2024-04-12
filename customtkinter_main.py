@@ -1,12 +1,11 @@
 import customtkinter as ctk
-from customtkinter import E, LEFT, N, S
 import os
 import random
 import pandas as pd
 import tkinter as tk
 import tkinter.messagebox as tk_messagebox
 import time as t
-from PIL import Image, ImageTk
+from PIL import Image
 
 set_appearance_mode = ("dark")
 
@@ -111,10 +110,6 @@ def show_start_screen():
     
 )
     submit_button.pack()
-
-
-
-
 
 def on_submit(start_screen):
     global user, user_id, session_id, start_time, user_sessions
