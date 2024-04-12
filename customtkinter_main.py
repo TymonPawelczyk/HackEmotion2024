@@ -12,10 +12,7 @@ from PIL import Image
 class GameApp:
     def __init__(self):
         self.root = ctk.CTk()
-        # self.root.title("Menu Start")
-        # root.geometry("400x200")
-
-        self.options = ["GameMode 1", "GameMode 2", "GameMode 3"]
+        self.options = ["10", "20"]
         
 
         self.start_time = None
@@ -58,7 +55,7 @@ class GameApp:
         self.main_menu = ctk.CTkToplevel(self.root)
         self.main_menu.geometry("400x200")
         self.main_menu.title("Menu Start")
-        label = ctk.CTkLabel(self.main_menu, text="Choose an option:")
+        label = ctk.CTkLabel(self.main_menu, text="Choose game length:")
         label.pack(pady=(20, 0))
 
         selected_option = ctk.StringVar()
@@ -75,11 +72,15 @@ class GameApp:
     def confirm_selection(self):
         selected_option = self.option_menu.get()
         print(f'Buttno confirm clicked. You choose: {selected_option}')
-        if selected_option == 'GameMode 1':
+        if selected_option == '10':
+            self.game_length = 10
             self.main_menu.withdraw()
             self.show_start_screen()
             print('gamemode1')
-        elif selected_option == 'GameMode 2':
+        elif selected_option == '20':
+            self.game_length = 20
+            self.main_menu.withdraw()
+            self.show_start_screen()
             print('gamemode2')
 
     def show_start_screen(self):
@@ -164,6 +165,12 @@ class GameApp:
 
 
     def on_button_click(self, button_number):
+        self.current_idx += 1
+        print(self.current_idx)
+        if(self.current_idx > self.game_length):
+            self.gameplay_screen.destroy()
+            self.root.destroy()
+            return
         if self.start_time is not None:
             response_time = t.time() - self.start_time
             print(
@@ -219,6 +226,7 @@ class GameApp:
         self.start_time = t.time()
 
     def gameplay_screen(self):
+        self.current_idx = 1
         self.gameplay_screen=ctk.CTkToplevel(self.root)
         self.gameplay_screen.title("Gameplay Screen")
         self.gameplay_screen.geometry("1200x700")
@@ -255,5 +263,3 @@ class GameApp:
 
 app = GameApp()
 app.main()
-
-
