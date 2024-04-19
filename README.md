@@ -9,5 +9,6 @@ Z początku myśleliśmy że to nie może być takie trudne, lecz szybko zmienil
 
 ## A teraz już o aplikacji 
 
-Sama aplikacje a bardziej grę oparliśmy o trywailne rozwiązanie w którym użytkowwnikowi przedstawiamy daną twarz wyrażającą daną emocje i to on ma zdecydować jaką mimikę ona przedstawia.
+Sama aplikacje a bardziej grę oparliśmy o trywailne rozwiązanie w którym użytkownikowi przedstawiamy daną twarz wyrażającą emocję i to on ma zdecydować jaką mimikę ona przedstawia.
 <br> Aplikacja posiada prosty i intuicyjny interfejs użytkownika, w której wybieramy długość gry. Następnie wprowadza swoje danej jak imię, nazwisko itd. po uzupełnieniu w odpowiedniu sposób tych pól przechodzimy już do rozgrywki.
+
